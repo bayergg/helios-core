@@ -491,7 +491,7 @@ export async function validateSelectedJvm(path: string, semverRange: string): Pr
  * Fetch the last open JDK binary.
  * 
  * HOTFIX: Uses Corretto 8 for macOS.
- * See: https://github.com/dscalzi/HeliosLauncher/issues/70
+ * See: https://github.com/bayergg/HeliosLauncher/issues/70
  * See: https://github.com/AdoptOpenJDK/openjdk-support/issues/101
  * 
  * @param {number} major The major version of Java to fetch.

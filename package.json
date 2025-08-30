@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dscalzi/helios-core.git"
+    "url": "git+https://github.com/bayergg/helios-core.git"
   },
   "keywords": [
     "helios-launcher",
@@ -54,9 +54,9 @@
   "author": "Daniel Scalzi",
   "license": " LGPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/dscalzi/helios-core/issues"
+    "url": "https://github.com/bayergg/helios-core/issues"
   },
-  "homepage": "https://github.com/dscalzi/helios-core#readme",
+  "homepage": "https://github.com/bayergg/helios-core#readme",
   "devDependencies": {
     "@stylistic/eslint-plugin-ts": "^3.1.0",
     "@types/chai": "^4.3.20",
