@@ -113,6 +113,7 @@ export class FullRepairReceiver implements Receiver {
             server.rawServer.minecraftVersion)
         const distributionIndexProcessor = new DistributionIndexProcessor(
             message.commonDirectory,
+            message.instanceDirectory,
             distribution,
             message.serverId
         )

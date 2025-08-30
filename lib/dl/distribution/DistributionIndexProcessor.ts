@@ -6,16 +6,17 @@ import { Asset, HashAlgo } from '../Asset'
 import { HeliosDistribution, HeliosModule, HeliosServer } from '../../common/distribution/DistributionFactory'
 import { Type } from 'helios-distribution-types'
 import { mcVersionAtLeast } from '../../common/util/MojangUtils'
-import { ensureDir, readJson, writeJson } from 'fs-extra'
+import { ensureDir, readJson, writeJson, readdir, remove} from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import { dirname } from 'path'
 import { VersionJsonBase } from '../mojang/MojangTypes'
+import { join } from 'path'
 
 export class DistributionIndexProcessor extends IndexProcessor {
 
     private static readonly logger = LoggerUtil.getLogger('DistributionIndexProcessor')
 
-    constructor(commonDir: string, protected distribution: HeliosDistribution, protected serverId: string) {
+    constructor(commonDir: string, protected instanceDir: string, protected distribution: HeliosDistribution, protected serverId: string) {
         super(commonDir)
     }
 
@@ -35,6 +36,7 @@ export class DistributionIndexProcessor extends IndexProcessor {
         }
 
         const notValid: Asset[] = []
+        this.removeExtraMods(server.modules)
         await this.validateModules(server.modules, notValid)
         await onStageComplete()
 
@@ -45,6 +47,16 @@ export class DistributionIndexProcessor extends IndexProcessor {
 
     public async postDownload(): Promise<void> {
         await this.loadModLoaderVersionJson()
+    }
+
+    private async removeExtraMods(modules: HeliosModule[]) {
+        const paths = new Set(modules.map(m => m.getPath().split(/[\\/]/).pop()))
+        const modsDir = join(this.instanceDir, this.serverId, 'mods')
+        for (const file of await readdir(modsDir)) {
+            if (!paths.has(file)) {
+                await remove(join(modsDir, file))
+            }
+        }
     }
 
     private async validateModules(modules: HeliosModule[], accumulator: Asset[]): Promise<void> {
@@ -92,16 +104,16 @@ export class DistributionIndexProcessor extends IndexProcessor {
 
                 const data = JSON.parse((await zip.entryData('version.json')).toString('utf8')) as VersionJsonBase
                 const writePath = getVersionJsonPath(this.commonDir, data.id)
-    
+
                 await ensureDir(dirname(writePath))
                 await writeJson(writePath, data)
-    
+
                 return data
             }
             finally {
                 await zip.close()
             }
-            
+
         }
     }
 
@@ -122,7 +134,7 @@ export class DistributionIndexProcessor extends IndexProcessor {
         }
 
         try {
-            
+
             const forgeVer = forgeVersion.split('-')[1]
 
             const maxFG2 = [14, 23, 5, 2847]
@@ -135,12 +147,11 @@ export class DistributionIndexProcessor extends IndexProcessor {
                     return false
                 }
             }
-        
+
             return false
 
         } catch(err) {
             throw new Error('Forge version is complex (changed).. launcher requires a patch.')
         }
     }
-
 }
